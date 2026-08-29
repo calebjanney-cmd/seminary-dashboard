@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fall 2026 Seminary Daily Dashboard</title>
+<style>
+:root{--navy:#0b2a5b;--teal:#0f6d73;--gold:#d99600;--red:#d3452f;--blue:#184e9e;--ink:#10213a;--paper:#f7f3ea;--line:#c8d0dc;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:#eceff3;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input{font:inherit}
+.wrap{max-width:1120px;margin:auto;padding:20px}
+.top{background:var(--paper);border:3px solid var(--navy);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(11,42,91,.08)}
+.hero{padding:22px 24px 16px;background:var(--paper)}
+.eyebrow{font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--teal);text-transform:uppercase}
+h1{margin:4px 0 10px;color:var(--navy);font-size:clamp(34px,6vw,68px);line-height:.94;letter-spacing:-.04em}
+.brush{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--teal),var(--navy),var(--teal));margin-top:12px}
+.weekbar{background:var(--navy);color:white;padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center}
+.weeknum{border:1px solid rgba(255,255,255,.4);border-radius:12px;padding:8px 14px;text-align:center}
+.weeknum small{display:block;font-weight:900;letter-spacing:.16em}
+.weeknum strong{font-size:42px;line-height:1}
+.meta h2{margin:0;font-size:26px}
+.meta p{margin:4px 0;font-size:14px}
+.meta .t{color:#86d6d4;font-weight:900} .meta .v{color:#ffd477;font-weight:900}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav button{min-height:44px;border:1px solid rgba(255,255,255,.45);border-radius:10px;background:transparent;color:white;font-weight:900;padding:0 14px;cursor:pointer}
+.nav button:disabled{opacity:.3;cursor:not-allowed}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:12px;background:var(--paper)}
+.daytab{min-height:48px;border:2px solid var(--line);border-radius:10px;background:white;font-weight:900;cursor:pointer}
+.daytab.sel{color:white}
+.card{margin-top:18px;background:var(--paper);border:3px solid var(--navy);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(11,42,91,.08)}
+.dayhead{color:white;padding:18px 22px;background:var(--navy);background-image:repeating-linear-gradient(-12deg,transparent 0 8px,rgba(255,255,255,.08) 8px 11px)}
+.dayhead-inner{display:flex;justify-content:space-between;gap:15px;align-items:end;flex-wrap:wrap}
+.dayhead small{font-weight:900;letter-spacing:.18em}
+.dayhead h3{margin:0;font-size:42px;line-height:1}
+.timebox{border:1px solid rgba(255,255,255,.45);border-radius:10px;padding:8px 12px;text-align:right}
+.timebox b{font-size:22px}
+.grid{display:grid;grid-template-columns:1.3fr .7fr}
+.main{padding:22px}
+.side{padding:22px;background:#eef2f6;border-left:3px solid var(--navy)}
+.section-kicker{font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--teal)}
+.section-title{font-size:24px;font-weight:950;color:var(--navy);margin:2px 0 14px}
+.badge{display:inline-block;border:2px solid var(--red);color:var(--red);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900;letter-spacing:.08em;margin-bottom:14px}
+.tasks{display:grid;gap:10px}
+.task{display:flex;gap:12px;align-items:flex-start;background:white;border:1px solid #d5dbe4;border-radius:12px;padding:13px 14px;font-weight:750;line-height:1.4}
+.task input{width:21px;height:21px;flex:none;margin-top:1px;accent-color:var(--teal)}
+.task.done span{text-decoration:line-through;opacity:.48}
+.step{display:grid;grid-template-columns:32px 1fr;gap:10px;margin:14px 0}
+.dot{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:white;font-weight:900}
+.finish{margin-top:18px;background:white;border:2px solid var(--navy);border-radius:12px;padding:13px}
+.finish small{font-weight:900;letter-spacing:.14em;color:var(--teal)}
+.reset{width:100%;min-height:46px;margin-top:14px;background:white;border:2px solid var(--navy);border-radius:10px;color:var(--navy);font-weight:900;cursor:pointer}
+.footer{margin:18px 0;background:var(--navy);color:white;padding:14px 18px;border-radius:14px;font-weight:900;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.footer em{font-style:normal;color:#ffd477}
+.datejump{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.datejump input{min-height:42px;border:2px solid var(--navy);border-radius:8px;padding:0 10px;background:white}
+.datejump button{min-height:42px;border:0;border-radius:8px;padding:0 14px;background:var(--teal);color:white;font-weight:900;cursor:pointer}
+.copybox{margin-top:14px;font-size:12px;color:#5e6774}
+@media(max-width:760px){.weekbar{grid-template-columns:auto 1fr}.nav{grid-column:1/-1}.grid{grid-template-columns:1fr}.side{border-left:0;border-top:3px solid var(--navy)}}
+@media(max-width:560px){.wrap{padding:10px}.days{grid-template-columns:repeat(5,minmax(54px,1fr));overflow:auto}.daytab{font-size:11px}.dayhead h3{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="top">
+    <div class="hero">
+      <div class="eyebrow">Fall 2026 • ADHD-friendly • Monday–Friday</div>
+      <h1>SEMINARY<br>DAILY DASHBOARD</h1>
+      <div style="font-weight:850;color:var(--teal)">8:30 AM starts • Exact assigned coursework • Weekends protected</div>
+      <div class="datejump">
+        <label for="jumpdate" style="font-weight:900">Jump to date:</label>
+        <input id="jumpdate" type="date" min="2026-08-31" max="2026-12-11">
+        <button id="jumpbtn" type="button">OPEN DAY</button>
+      </div>
+      <div class="brush"></div>
+    </div>
+    <div class="weekbar">
+      <div class="weeknum"><small>WEEK</small><strong id="weeknum">1</strong></div>
+      <div class="meta">
+        <h2 id="weekrange"></h2>
+        <p><span class="t">THEOLOGY:</span> <span id="theology"></span></p>
+        <p><span class="v">VOCATION:</span> <span id="vocation"></span></p>
+      </div>
+      <div class="nav">
+        <button id="prev">← PREV</button>
+        <button id="next">NEXT →</button>
+      </div>
+    </div>
+    <div class="days" id="days"></div>
+  </section>
+
+  <section class="card">
+    <div class="dayhead" id="dayhead">
+      <div class="dayhead-inner">
+        <div><small id="dateLabel"></small><h3 id="dayLabel"></h3></div>
+        <div class="timebox"><small>MORNING BLOCK</small><br><b id="timeLabel"></b></div>
+      </div>
+    </div>
+    <div class="grid">
+      <main class="main">
+        <div class="section-kicker">ASSIGNED COURSEWORK</div>
+        <div class="section-title">TODAY'S MISSION</div>
+        <div id="badge" class="badge" style="display:none"></div>
+        <div class="tasks" id="tasks"></div>
+        <div class="copybox">Direct-link format: <code>?date=YYYY-MM-DD</code>. Example: <code>?date=2026-10-29</code>.</div>
+      </main>
+      <aside class="side">
+        <div class="section-kicker">FLOW</div>
+        <div class="section-title">HOW TO WORK IT</div>
+        <div class="step"><div class="dot" style="background:var(--teal)">1</div><div><b>LAUNCH</b><br><span>Open only today’s assigned material.</span></div></div>
+        <div class="step"><div class="dot" style="background:var(--gold)">2</div><div><b>FOCUS</b><br><span>25-minute sprint. Take a 5-minute break if needed.</span></div></div>
+        <div class="step"><div class="dot" style="background:var(--red)">3</div><div><b>CLOSE</b><br><span>Write one takeaway and your exact NEXT starting point.</span></div></div>
+        <div class="finish"><small>FINISH LINE</small><div id="finish" style="font-weight:900;margin-top:4px"></div></div>
+        <button class="reset" id="reset" type="button">RESET TODAY</button>
+      </aside>
+    </div>
+  </section>
+
+  <div class="footer"><span>SMALL DAILY PROGRESS BEATS LAST-MINUTE PANIC.</span><em>FRIDAY CLOSES THE LOOP →</em></div>
+</div>
+
+<script>
+const WEEKS=[{"n": 1, "range": "Aug 31–Sep 4", "theology": "Introduction & Revelation", "vocation": "Introductions / Barton", "days": [["2026-08-31", "MONDAY", "8:30–9:30", ["Theology — Jones pp. 1–18"], "Finish Jones p. 18. Write NEXT: p. 19."], ["2026-09-01", "TUESDAY", "8:30–10:00", ["Theology — Jones pp. 19–36", "Vocation — Barton Block A"], "Finish both blocks; keep Theology and Vocation separate."], ["2026-09-02", "WEDNESDAY", "8:30–9:30", ["Theology — Jones pp. 37–53"], "Finish Jones p. 53."], ["2026-09-03", "THURSDAY", "8:30–10:00", ["Theology — Love Divine pp. 1–18", "Vocation — Barton Block B", "Vocation — complete weekly participation/post"], "All assigned reading finished before Friday."], ["2026-09-04", "FRIDAY", "8:30–9:45", ["McCall–Abraham debate", "Doctrine Map — Introduction / Revelation", "Quiz review", "Take Theology Quiz 1", "Write Monday’s first task"], "Quiz submitted. School closed for the weekend."]]}, {"n": 2, "range": "Sep 7–11", "theology": "Perfections of God", "vocation": "Trinitarian Image", "days": [["2026-09-07", "MONDAY", "8:30–9:30", ["Love Divine pp. 19–36"], "Stop at p. 36."], ["2026-09-08", "TUESDAY", "8:30–10:00", ["Love Divine pp. 37–53", "Seamands Block A"], "Complete both blocks."], ["2026-09-09", "WEDNESDAY", "8:30–9:30", ["Love Divine pp. 54–70"], "Finish Love Divine chapter assignment."], ["2026-09-10", "THURSDAY", "8:30–10:00", ["Oden pp. 39–57", "Seamands Block B", "Vocation participation/post"], "Stop Oden at p. 57."], ["2026-09-11", "FRIDAY", "8:30–9:45", ["Oden pp. 58–75", "Doctrine Map — Perfections of God", "Quiz review", "Take Theology Quiz 2"], "Quiz submitted. Weekend clear."]]}, {"n": 3, "range": "Sep 14–18", "theology": "Trinity", "vocation": "Trinitarian Image", "days": [["2026-09-14", "MONDAY", "8:30–9:30", ["Love Divine pp. 71–87"], "Stop at p. 87."], ["2026-09-15", "TUESDAY", "8:30–10:00", ["Love Divine pp. 88–103", "Vocation reading / synthesis"], "Theology first, then Vocation."], ["2026-09-16", "WEDNESDAY", "8:30–9:30", ["Love Divine pp. 104–119"], "Finish Love Divine Trinity reading."], ["2026-09-17", "THURSDAY", "8:30–10:00", ["Jones pp. 55–76", "Vocation participation", "Close Trinitarian Image module"], "All reading closed before Friday."], ["2026-09-18", "FRIDAY", "8:30–9:45", ["Doctrine Map — Trinity", "Quiz review", "Take Theology Quiz 3"], "Quiz submitted. Weekend clear."]]}, {"n": 4, "range": "Sep 21–25", "theology": "Creation", "vocation": "Call / Guinness", "days": [["2026-09-21", "MONDAY", "8:30–9:30", ["Jones pp. 77–96"], "Finish Jones."], ["2026-09-22", "TUESDAY", "8:30–10:00", ["Love Divine pp. 120–136", "Guinness Block A"], "Complete both blocks."], ["2026-09-23", "WEDNESDAY", "8:30–9:30", ["Love Divine pp. 137–152"], "Finish Creation reading."], ["2026-09-24", "THURSDAY", "8:30–10:00", ["Guinness Block B", "Vocation participation", "Write 5 raw bullets about your call"], "Leave with five usable Call Paper ideas."], ["2026-09-25", "FRIDAY", "8:30–9:45", ["Doctrine Map — Creation", "Quiz review", "Take Theology Quiz 4"], "Quiz submitted. Weekend clear."]]}, {"n": 5, "range": "Sep 28–Oct 2", "theology": "Providence", "vocation": "Call", "badge": "CALL PAPER WEEK", "days": [["2026-09-28", "MONDAY", "8:30–9:30", ["Love Divine pp. 153–168", "Finish Guinness"], "Input finished."], ["2026-09-29", "TUESDAY", "8:30–10:00", ["Love Divine pp. 169–184", "Call Paper — thesis + outline"], "Leave with thesis and headings."], ["2026-09-30", "WEDNESDAY", "8:30–10:00", ["Love Divine pp. 185–199", "Call Paper — ugly draft"], "Get the full rough draft down."], ["2026-10-01", "THURSDAY", "8:30–10:00", ["Pawl pp. 41–60", "Call Paper — revise + format + SUBMIT", "Vocation participation"], "Call Paper submitted today."], ["2026-10-02", "FRIDAY", "8:30–9:45", ["Doctrine Map — Providence", "Quiz review", "Take Theology Quiz 5"], "Quiz submitted. Weekend clear."]]}, {"n": 6, "range": "Oct 5–9", "theology": "Anthropology", "vocation": "Gender & Call", "days": [["2026-10-05", "MONDAY", "8:30–9:30", ["Jones pp. 97–116"], "Finish Jones."], ["2026-10-06", "TUESDAY", "8:30–10:00", ["Love Divine pp. 200–216", "Dixon/Barton Block A"], "Complete both blocks."], ["2026-10-07", "WEDNESDAY", "8:30–9:30", ["Love Divine pp. 217–232"], "Stop at p. 232."], ["2026-10-08", "THURSDAY", "8:30–10:00", ["Love Divine pp. 233–248", "Dixon/Barton Block B", "Vocation participation"], "Finish module reading."], ["2026-10-09", "FRIDAY", "8:30–9:45", ["Doctrine Map — Anthropology", "Quiz review", "Take Theology Quiz 6"], "Quiz submitted. Weekend clear."]]}, {"n": 7, "range": "Oct 12–16", "theology": "Sin", "vocation": "Gender & Call", "badge": "CHECK LMS: MISSING READING B", "days": [["2026-10-12", "MONDAY", "8:30–9:30", ["Love Divine pp. 249–262"], "Stop at p. 262."], ["2026-10-13", "TUESDAY", "8:30–10:00", ["Love Divine pp. 263–275", "Finish Dixon/Barton"], "Complete both."], ["2026-10-14", "WEDNESDAY", "8:30–9:30", ["Love Divine pp. 276–287", "Forsaken — Chunk 1"], "Begin banking Forsaken."], ["2026-10-15", "THURSDAY", "8:30–10:00", ["Forsaken — continue Chunk 1", "Vocation synthesis / participation", "Close Gender & Call"], "Close Vocation module."], ["2026-10-16", "FRIDAY", "8:30–9:45", ["Doctrine Map — Sin", "Quiz review", "Take Theology Quiz 7"], "Quiz submitted. Weekend clear."]]}, {"n": 8, "range": "Oct 19–23", "theology": "Election", "vocation": "Multi-ethnic / Multi-cultural", "badge": "CHECK LMS: MISSING READING B", "days": [["2026-10-19", "MONDAY", "8:30–9:30", ["Love Divine pp. 288–300"], "Stop at p. 300."], ["2026-10-20", "TUESDAY", "8:30–10:00", ["Love Divine pp. 301–313", "Sanders Block A"], "Complete both."], ["2026-10-21", "WEDNESDAY", "8:30–9:30", ["Love Divine pp. 314–326", "Forsaken — Chunk 2"], "Finish Election reading."], ["2026-10-22", "THURSDAY", "8:30–10:00", ["Sanders Block B", "Forsaken as needed", "Vocation participation"], "Participation submitted."], ["2026-10-23", "FRIDAY", "8:30–9:45", ["Doctrine Map — Election", "Quiz review", "Take Theology Quiz 8"], "Quiz submitted. Weekend clear."]]}, {"n": 9, "range": "Oct 26–30", "theology": "Person of Christ", "vocation": "Cross-cultural", "badge": "CROSS-CULTURAL PAPER WEEK", "days": [["2026-10-26", "MONDAY", "8:30–9:30", ["Love Divine pp. 327–345", "Finish Sanders"], "Finish input."], ["2026-10-27", "TUESDAY", "8:30–10:00", ["Love Divine pp. 346–363", "Cross-cultural Paper — outline"], "Thesis + headings complete."], ["2026-10-28", "WEDNESDAY", "8:30–10:00", ["Jones pp. 117–128", "Cross-cultural Paper — ugly draft"], "Complete full rough draft."], ["2026-10-29", "THURSDAY", "8:30–10:00", ["Jones pp. 129–139", "Cross-cultural Paper — revise + SUBMIT", "Vocation participation"], "Paper submitted today."], ["2026-10-30", "FRIDAY", "8:30–9:45", ["Doctrine Map — Person of Christ", "Quiz review", "Take Theology Quiz 9"], "Quiz submitted. Weekend clear."]]}, {"n": 10, "range": "Nov 2–6", "theology": "Work of Christ", "vocation": "Reading Week", "days": [["2026-11-02", "MONDAY", "8:30–9:30", ["Love Divine pp. 364–383"], "Stop at p. 383."], ["2026-11-03", "TUESDAY", "8:30–10:00", ["Love Divine pp. 384–402"], "Theology only; enjoy the Vocation margin."], ["2026-11-04", "WEDNESDAY", "8:30–9:30", ["Jones pp. 141–153", "Forsaken — Chunk 3"], "Bank Forsaken reading."], ["2026-11-05", "THURSDAY", "8:30–10:00", ["Jones pp. 154–165", "Continue Forsaken", "Quick Vocation LMS check"], "Confirm Reading Week has no submission."], ["2026-11-06", "FRIDAY", "8:30–9:45", ["Doctrine Map — Work of Christ", "Quiz review", "Take Theology Quiz 10"], "Quiz submitted. Weekend clear."]]}, {"n": 11, "range": "Nov 9–13", "theology": "Holy Spirit", "vocation": "Call Through the Ages / Rule of Life", "days": [["2026-11-09", "MONDAY", "8:30–9:30", ["Love Divine pp. 403–421"], "Stop at p. 421."], ["2026-11-10", "TUESDAY", "8:30–10:00", ["Love Divine pp. 422–441", "Articles/Barton Block A"], "Complete both blocks."], ["2026-11-11", "WEDNESDAY", "8:30–9:30", ["Jones pp. 167–179", "Forsaken — Chunk 4"], "Bank Forsaken reading."], ["2026-11-12", "THURSDAY", "8:30–10:00", ["Jones pp. 180–191", "Vocation Block B", "Vocation participation", "Rule of Life idea dump"], "Leave with raw Rule of Life ideas."], ["2026-11-13", "FRIDAY", "8:30–9:45", ["Doctrine Map — Holy Spirit", "Quiz review", "Take Theology Quiz 11"], "Quiz submitted. Weekend clear."]]}, {"n": 12, "range": "Nov 16–20", "theology": "Salvation", "vocation": "Rule of Life", "badge": "RULE OF LIFE PAPER WEEK", "days": [["2026-11-16", "MONDAY", "8:30–9:30", ["Love Divine pp. 442–454", "Finish Vocation reading", "Finish Forsaken if needed"], "All input complete."], ["2026-11-17", "TUESDAY", "8:30–10:00", ["Love Divine pp. 455–467", "Rule of Life — outline"], "Structure complete."], ["2026-11-18", "WEDNESDAY", "8:30–10:00", ["Love Divine pp. 468–479", "Rule of Life — ugly draft"], "Complete full rough draft."], ["2026-11-19", "THURSDAY", "8:30–10:00", ["Forsaken review", "Rule of Life — revise + SUBMIT", "Vocation participation"], "Rule of Life submitted today."], ["2026-11-20", "FRIDAY", "8:30–9:45", ["Doctrine Map — Salvation", "Quiz review", "Take Theology Quiz 12"], "Quiz submitted. Weekend clear."]]}, {"n": 13, "range": "Nov 23–27", "theology": "No regular module", "vocation": "Pastoral Ethics", "badge": "LIGHT WEEK / THANKSGIVING", "days": [["2026-11-23", "MONDAY", "8:30–9:30", ["Oden, Human Destiny pp. 765–789"], "Bank final-week reading."], ["2026-11-24", "TUESDAY", "8:30–10:00", ["Wheeler Block A"], "Vocation only."], ["2026-11-25", "WEDNESDAY", "8:30–9:30", ["Oden pp. 790–814", "Vocation participation / check-in"], "Close school before Thanksgiving."], ["2026-11-26", "THURSDAY", "OFF", ["THANKSGIVING — No coursework"], "Off means off."], ["2026-11-27", "FRIDAY", "OFF", ["No coursework"], "Four-day break continues."]]}, {"n": 14, "range": "Nov 30–Dec 4", "theology": "Ecclesiology", "vocation": "Pastoral Ethics", "days": [["2026-11-30", "MONDAY", "8:30–9:30", ["Love Divine pp. 480–495"], "Stop at p. 495."], ["2026-12-01", "TUESDAY", "8:30–10:00", ["Love Divine pp. 496–510", "Wheeler Block B"], "Complete both blocks."], ["2026-12-02", "WEDNESDAY", "8:30–9:30", ["Love Divine pp. 511–524"], "Finish Love Divine."], ["2026-12-03", "THURSDAY", "8:30–10:00", ["Jones pp. 191–213", "Finish Wheeler", "Final Vocation participation / closeout"], "Vocation course closed."], ["2026-12-04", "FRIDAY", "8:30–9:45", ["Doctrine Map — Ecclesiology", "Quiz review", "Take Theology Quiz 13"], "Final weekly quiz submitted."]]}, {"n": 15, "range": "Dec 7–11", "theology": "Eschatology + Final", "vocation": "None", "badge": "FINAL WEEK", "days": [["2026-12-07", "MONDAY", "8:30–9:30", ["Oden pp. 815–839"], "Finish Oden."], ["2026-12-08", "TUESDAY", "8:30–10:00", ["Jones pp. 215–227", "Final review — Doctrine Maps 1–4"], "Review early-course doctrines."], ["2026-12-09", "WEDNESDAY", "8:30–9:30", ["Jones pp. 228–240", "Final review — Doctrine Maps 5–9"], "Finish assigned reading."], ["2026-12-10", "THURSDAY", "8:30–10:00", ["Doctrine Map — Eschatology", "Review Doctrine Maps 10–14", "Final exam preparation"], "Everything ready for Friday."], ["2026-12-11", "FRIDAY", "8:30–9:45", ["TH501 FINAL — complete / submit", "Final course closeout"], "Semester finished."]]}];
+const COLORS=['#0b2a5b','#0f6d73','#d99600','#d3452f','#184e9e'];
+let wi=0,di=0;
+const $=id=>document.getElementById(id);
+
+function allDates(){
+  const map={};
+  WEEKS.forEach((w,wix)=>w.days.forEach((d,dix)=>map[d[0]]=[wix,dix]));
+  return map;
+}
+const DATE_MAP=allDates();
+
+function storageKey(date,idx){return `seminary:${date}:${idx}`}
+
+function setDate(date, push=true){
+  if(!DATE_MAP[date]) return false;
+  [wi,di]=DATE_MAP[date];
+  if(push){
+    const u=new URL(location.href);
+    u.searchParams.set('date',date);
+    history.replaceState(null,'',u);
+  }
+  render();
+  return true;
+}
+
+function render(){
+  const w=WEEKS[wi], d=w.days[di];
+  $('weeknum').textContent=w.n;
+  $('weekrange').textContent=w.range;
+  $('theology').textContent=w.theology;
+  $('vocation').textContent=w.vocation;
+  $('prev').disabled=wi===0;
+  $('next').disabled=wi===WEEKS.length-1;
+
+  const days=$('days'); days.innerHTML='';
+  w.days.forEach((x,i)=>{
+    const b=document.createElement('button');
+    b.className='daytab'+(i===di?' sel':'');
+    b.style.background=i===di?COLORS[i]:'white';
+    b.style.borderColor=i===di?COLORS[i]:'var(--line)';
+    b.textContent=x[1].slice(0,3);
+    b.onclick=()=>{di=i;setDate(w.days[i][0]);};
+    days.appendChild(b);
+  });
+
+  $('dayhead').style.backgroundColor=COLORS[di];
+  const dateObj=new Date(d[0]+'T12:00:00');
+  $('dateLabel').textContent=dateObj.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+  $('dayLabel').textContent=d[1];
+  $('timeLabel').textContent=d[2];
+  $('jumpdate').value=d[0];
+
+  const badge=$('badge');
+  if(w.badge){badge.style.display='inline-block';badge.textContent=w.badge;} else badge.style.display='none';
+
+  const tasks=$('tasks');tasks.innerHTML='';
+  d[3].forEach((t,idx)=>{
+    const lab=document.createElement('label'); lab.className='task';
+    const cb=document.createElement('input'); cb.type='checkbox';
+    cb.checked=localStorage.getItem(storageKey(d[0],idx))==='1';
+    const span=document.createElement('span'); span.textContent=t;
+    const sync=()=>{lab.classList.toggle('done',cb.checked);localStorage.setItem(storageKey(d[0],idx),cb.checked?'1':'0')};
+    cb.onchange=sync; sync();
+    lab.append(cb,span);tasks.appendChild(lab);
+  });
+  $('finish').textContent=d[4];
+}
+
+$('prev').onclick=()=>{if(wi>0){wi--;di=0;setDate(WEEKS[wi].days[0][0]);}};
+$('next').onclick=()=>{if(wi<WEEKS.length-1){wi++;di=0;setDate(WEEKS[wi].days[0][0]);}};
+$('jumpbtn').onclick=()=>{if(!setDate($('jumpdate').value)) alert('That date is not a scheduled coursework day.');};
+$('reset').onclick=()=>{
+  const d=WEEKS[wi].days[di];
+  d[3].forEach((_,idx)=>localStorage.removeItem(storageKey(d[0],idx)));
+  render();
+};
+
+const param=new URL(location.href).searchParams.get('date');
+if(param && DATE_MAP[param]) setDate(param,false);
+else {
+  const today=new Date();
+  const iso=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+  if(DATE_MAP[iso]) setDate(iso,false); else render();
+}
+</script>
+</body>
+</html>
